@@ -36,6 +36,7 @@ An end-to-end CLI smoke test used the official NewPipe v0.29.1 GitHub APK: inspe
 - Production budgets: JavaScript 5.60 KB raw, CSS 10.44 KB raw, fonts 0 KB, hero WebP 98.57 KB.
 - `npm audit`: zero known vulnerabilities.
 - YAML workflow/manifests linted; release metadata generator exercised against all four archive names.
+- GitHub CI run `33156071830` and release run `33156099766` completed successfully. The public [v0.1.0 release](https://github.com/B-Divyesh/sf-apk-release-pocket/releases/tag/v0.1.0) contains Linux, both macOS architectures, Windows, `.deb`, `.rpm`, both `.pkg` files, `latest.json`, and `SHA256SUMS`. The Linux archive was downloaded again, matched both `latest.json` and `SHA256SUMS`, extracted, and reported `arp 0.1.0`.
 
 ## Known gaps
 
