@@ -1,0 +1,13 @@
+{
+  "version": "0.1.0",
+  "description": "Verify signed Android APKs and build self-hosted release pockets",
+  "homepage": "https://apk-release-pocket.sociobot.in",
+  "license": "MIT",
+  "url": "https://github.com/B-Divyesh/sf-apk-release-pocket/releases/download/v0.1.0/apk-release-pocket-0.1.0-windows-x86_64.zip",
+  "hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "bin": "arp.exe",
+  "checkver": { "github": "https://github.com/B-Divyesh/sf-apk-release-pocket" },
+  "autoupdate": {
+    "url": "https://github.com/B-Divyesh/sf-apk-release-pocket/releases/download/v$version/apk-release-pocket-$version-windows-x86_64.zip"
+  }
+}

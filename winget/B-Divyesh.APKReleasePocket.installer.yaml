@@ -1,0 +1,13 @@
+PackageIdentifier: B-Divyesh.APKReleasePocket
+PackageVersion: 0.1.0
+InstallerType: zip
+NestedInstallerType: portable
+NestedInstallerFiles:
+  - RelativeFilePath: arp.exe
+    PortableCommandAlias: arp
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/B-Divyesh/sf-apk-release-pocket/releases/download/v0.1.0/apk-release-pocket-0.1.0-windows-x86_64.zip
+    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+ManifestType: installer
+ManifestVersion: 1.6.0

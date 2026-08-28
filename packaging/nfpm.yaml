@@ -1,0 +1,14 @@
+name: apk-release-pocket
+arch: amd64
+platform: linux
+version: __VERSION__
+section: utils
+priority: optional
+maintainer: Sociobot <support@sociobot.in>
+description: Verify signed Android APKs and build self-hosted release pockets.
+vendor: Sociobot
+homepage: https://apk-release-pocket.sociobot.in
+license: MIT
+contents:
+  - src: ./package-root/usr/local/bin/arp
+    dst: /usr/local/bin/arp

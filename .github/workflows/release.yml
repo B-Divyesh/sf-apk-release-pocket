@@ -1,0 +1,152 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing v* tag to publish
+        required: true
+        default: v0.1.0
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-musl
+      - run: sudo apt-get update && sudo apt-get install -y musl-tools
+      - run: cargo test --locked
+      - run: cargo build --locked --release --target x86_64-unknown-linux-musl
+      - name: Package Linux archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [[ "$GITHUB_REF_TYPE" != "tag" ]]; then VERSION="${{ inputs.tag }}"; VERSION="${VERSION#v}"; fi
+          mkdir -p release-assets package-root/usr/local/bin
+          cp target/x86_64-unknown-linux-musl/release/arp package-root/usr/local/bin/arp
+          strip package-root/usr/local/bin/arp || true
+          tar -C package-root/usr/local/bin -czf "release-assets/apk-release-pocket-${VERSION}-linux-x86_64.tar.gz" arp
+          curl -fsSL "https://github.com/goreleaser/nfpm/releases/download/v2.43.0/nfpm_2.43.0_Linux_x86_64.tar.gz" | tar -xz -C "$RUNNER_TEMP" nfpm
+          sed "s/__VERSION__/${VERSION}/g" packaging/nfpm.yaml > "$RUNNER_TEMP/nfpm.yaml"
+          "$RUNNER_TEMP/nfpm" package --config "$RUNNER_TEMP/nfpm.yaml" --packager deb --target "release-assets/apk-release-pocket_${VERSION}_amd64.deb"
+          "$RUNNER_TEMP/nfpm" package --config "$RUNNER_TEMP/nfpm.yaml" --packager rpm --target "release-assets/apk-release-pocket-${VERSION}.x86_64.rpm"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-linux
+          path: release-assets/*
+          if-no-files-found: error
+
+  macos:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-apple-darwin
+            arch: x86_64
+          - target: aarch64-apple-darwin
+            arch: aarch64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - run: cargo build --locked --release --target ${{ matrix.target }}
+      - name: Package macOS archive and installer
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [[ "$GITHUB_REF_TYPE" != "tag" ]]; then VERSION="${{ inputs.tag }}"; VERSION="${VERSION#v}"; fi
+          mkdir -p release-assets package-root/usr/local/bin
+          cp "target/${{ matrix.target }}/release/arp" package-root/usr/local/bin/arp
+          strip package-root/usr/local/bin/arp || true
+          tar -C package-root/usr/local/bin -czf "release-assets/apk-release-pocket-${VERSION}-macos-${{ matrix.arch }}.tar.gz" arp
+          pkgbuild --root package-root --identifier in.sociobot.apk-release-pocket --version "$VERSION" "release-assets/apk-release-pocket-${VERSION}-macos-${{ matrix.arch }}.pkg"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-macos-${{ matrix.arch }}
+          path: release-assets/*
+          if-no-files-found: error
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+      - run: cargo test --locked
+      - run: cargo build --locked --release --target x86_64-pc-windows-msvc
+      - name: Package portable Windows archive
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          if ("${{ github.ref_type }}" -ne "tag") { $version = "${{ inputs.tag }}".TrimStart('v') }
+          New-Item -ItemType Directory -Path release-assets | Out-Null
+          Compress-Archive -Path target/x86_64-pc-windows-msvc/release/arp.exe -DestinationPath "release-assets/apk-release-pocket-$version-windows-x86_64.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-windows
+          path: release-assets/*
+          if-no-files-found: error
+
+  publish:
+    needs: [linux, macos, windows]
+    runs-on: ubuntu-latest
+    env:
+      HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: release-assets
+          merge-multiple: true
+      - name: Create checksums and machine-readable manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          if [[ "$GITHUB_REF_TYPE" != "tag" ]]; then TAG="${{ inputs.tag }}"; fi
+          VERSION="${TAG#v}"
+          cd release-assets
+          python3 ../packaging/make-release-metadata.py "$VERSION" "$TAG" .
+          find . -maxdepth 1 -type f ! -name SHA256SUMS -printf '%f\0' | sort -z | xargs -0 sha256sum > SHA256SUMS
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
+          name: APK Release Pocket ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: release-assets/*
+      - name: Update Homebrew tap when the factory token is configured
+        if: ${{ env.HOMEBREW_TAP_TOKEN != '' }}
+        env:
+          GH_TOKEN: ${{ env.HOMEBREW_TAP_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OWNER="B-Divyesh"
+          TAP="homebrew-apk-release-pocket"
+          if ! curl -fsS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$OWNER/$TAP" >/dev/null; then
+            curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/user/repos -d "{\"name\":\"$TAP\",\"description\":\"Homebrew tap for APK Release Pocket\",\"private\":false}"
+          fi
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/${OWNER}/${TAP}.git" tap
+          mkdir -p tap/Formula
+          cp release-assets/apk-release-pocket.rb tap/Formula/apk-release-pocket.rb
+          cd tap
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add Formula/apk-release-pocket.rb
+          git diff --cached --quiet || git commit -m "apk-release-pocket ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}"
+          git push

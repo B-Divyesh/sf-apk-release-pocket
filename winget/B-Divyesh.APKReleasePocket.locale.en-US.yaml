@@ -1,0 +1,10 @@
+PackageIdentifier: B-Divyesh.APKReleasePocket
+PackageVersion: 0.1.0
+PackageLocale: en-US
+Publisher: Sociobot
+PackageName: APK Release Pocket
+License: MIT
+ShortDescription: Verify signed Android APKs and build self-hosted release pockets.
+PackageUrl: https://apk-release-pocket.sociobot.in
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0
