@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://apk-release-pocket.sociobot.in/sitemap.xml

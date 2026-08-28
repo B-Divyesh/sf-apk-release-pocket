@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-$manifestUrl = 'https://github.com/B-Divyesh/sf-apk-release-pocket/releases/latest/download/latest.json'
+$manifestUrl = if ($env:ARP_MANIFEST_URL) { $env:ARP_MANIFEST_URL } else { 'https://github.com/B-Divyesh/sf-apk-release-pocket/releases/latest/download/latest.json' }
 $installDir = if ($env:ARP_INSTALL_DIR) { $env:ARP_INSTALL_DIR } else { Join-Path $env:LOCALAPPDATA 'Programs\APKReleasePocket' }
 $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ([System.Guid]::NewGuid().ToString())
 New-Item -ItemType Directory -Path $tempDir | Out-Null

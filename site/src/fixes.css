@@ -7,3 +7,78 @@ body .button small {
 [hidden] {
   display: none !important;
 }
+
+.trust-strip { grid-template-columns: repeat(3, 1fr); }
+
+.demo-banner {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 52px;
+  padding: 6px max(20px, calc((100vw - 1180px) / 2));
+  background: var(--amber);
+  color: #211600;
+  border-bottom: 2px solid #090d12;
+}
+
+.demo-banner p { margin: 0; }
+.demo-banner div { display: flex; gap: 8px; }
+.demo-banner button,
+.demo-banner a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 2px solid #211600;
+  background: transparent;
+  color: #211600;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.demo-terminal {
+  max-width: 700px;
+  margin: 28px 0;
+  padding: 20px;
+  border: 1px solid #526573;
+  background: #06090c;
+  box-shadow: 8px 8px 0 rgba(102, 228, 221, .18);
+  font: 14px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+.demo-terminal p { margin: 0 0 6px; overflow-wrap: anywhere; }
+.demo-terminal p:last-child { margin: 0; }
+.demo-terminal span,
+.demo-terminal strong { color: var(--cyan); }
+.demo-mode .demo-terminal[hidden] { display: block !important; }
+.demo-mode .hero-art { display: none; }
+.demo-mode .hero { min-height: 660px; }
+.demo-mode .hero-copy { padding: 64px 0; }
+.demo-mode .hero-actions > .primary { display: none; }
+.demo-mode .license-desk { display: none; }
+
+.demo-recording { margin: 56px 0 0; }
+.demo-recording img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #41505c;
+  box-shadow: 10px 10px 0 #0d1116;
+}
+.demo-recording figcaption { margin-top: 16px; color: var(--smoke); }
+.release-state.pending { color: var(--amber); }
+.release-state.offline { color: var(--smoke); }
+
+footer > p small { display: block; margin-top: 4px; color: var(--smoke); }
+
+@media (max-width: 760px) {
+  .demo-banner { position: static; align-items: flex-start; flex-direction: column; padding: 10px 14px; }
+  .demo-banner div { width: 100%; }
+  .demo-banner button, .demo-banner a { flex: 1; justify-content: center; }
+  .demo-mode .hero { min-height: auto; }
+  .demo-mode .hero-copy { padding: 48px 0; }
+}

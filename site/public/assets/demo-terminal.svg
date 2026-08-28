@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="420" viewBox="0 0 1120 420" role="img" aria-labelledby="title desc">
+  <title id="title">APK Release Pocket demo terminal</title>
+  <desc id="desc">The arp demo command checks a signed sample APK and writes a release pocket to a temporary folder.</desc>
+  <rect width="1120" height="420" fill="#06090c"/>
+  <path d="M0 58h1120" stroke="#354653"/>
+  <circle cx="32" cy="29" r="7" fill="#ff6b57"/><circle cx="56" cy="29" r="7" fill="#ffc857"/><circle cx="80" cy="29" r="7" fill="#66e4dd"/>
+  <text x="1080" y="35" fill="#b9c2c9" text-anchor="end" font-family="ui-monospace,monospace" font-size="15">sample-release</text>
+  <g font-family="ui-monospace,monospace" font-size="21">
+    <text x="32" y="108" fill="#66e4dd">$</text><text x="62" y="108" fill="#f4eddf">arp demo</text>
+    <text x="32" y="158" fill="#66e4dd">✓ verified</text><text x="160" y="158" fill="#f4eddf">Imagepipe sample 0.72 (51)</text>
+    <text x="32" y="208" fill="#b9c2c9">publisher</text><text x="190" y="208" fill="#f4eddf">36:91:F6:EF:66:DB:E3:F7:…:4C:3B:F6:10</text>
+    <text x="32" y="258" fill="#b9c2c9">pocket</text><text x="190" y="258" fill="#f4eddf">/tmp/apk-release-pocket-demo…/pocket/index.html</text>
+    <text x="32" y="308" fill="#b9c2c9">files</text><text x="190" y="308" fill="#f4eddf">index.html · release.json · releases.json · SHA256SUMS</text>
+  </g>
+  <rect x="32" y="350" width="368" height="42" fill="#101821" stroke="#ffc857"/>
+  <text x="50" y="377" fill="#ffc857" font-family="ui-monospace,monospace" font-size="16">TEMP FOLDER · REAL SIGNATURE CHECK</text>
+</svg>

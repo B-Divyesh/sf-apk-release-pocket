@@ -1,1 +1,27 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><meta name="description" content="Privacy policy for APK Release Pocket"><title>Privacy — APK Release Pocket</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/src/style.css"></head><body><a class="skip-link" href="#main">Skip to main content</a><header class="site-header"><a class="brand" href="/"><span>ARP</span><small>release pocket</small></a><nav aria-label="Primary navigation"><a href="/">Home</a><a href="/terms/">Terms</a></nav></header><main id="main" class="legal-main"><p class="kicker">Plain-language policy</p><h1>Privacy</h1><p>Effective August 28, 2026.</p><h2>The CLI</h2><p>APK Release Pocket processes APKs entirely on your computer. It does not upload APKs, fingerprints, release metadata, or credentials, and contains no telemetry.</p><h2>The website</h2><p>The site does not use analytics, advertising, third-party fonts, or tracking cookies. Your host may retain standard short-lived access logs for security and delivery.</p><h2>Paid unlock</h2><p>If you buy Team lantern, Sociobot/Dodo handles checkout as merchant of record. This site stores the license token at <code>sb_license:apk-release-pocket</code>, its latest verification result, and team audit notes in your browser’s local storage. Verification sends the token to <code>api.sociobot.in</code> at most once daily. Remove site data in your browser to delete it.</p><h2>Contact</h2><p>Open an issue in the <a href="https://github.com/B-Divyesh/sf-apk-release-pocket/issues">public repository</a> for privacy questions. Do not post a license token or private APK.</p></main><footer><a class="brand" href="/"><span>ARP</span><small>release pocket</small></a><nav aria-label="Legal"><a href="/privacy/" aria-current="page">Privacy</a><a href="/terms/">Terms</a></nav></footer></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#090d12">
+    <meta name="description" content="How APK Release Pocket handles APKs, release data, licenses, and browser storage.">
+    <title>Privacy — APK Release Pocket</title>
+    <link rel="canonical" href="https://apk-release-pocket.sociobot.in/privacy/">
+    <meta property="og:type" content="website"><meta property="og:title" content="Privacy — APK Release Pocket"><meta property="og:description" content="How APK Release Pocket handles APKs and browser storage."><meta property="og:image" content="https://apk-release-pocket.sociobot.in/assets/social-card.jpg">
+    <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Privacy — APK Release Pocket"><meta name="twitter:description" content="How APK Release Pocket handles APKs and browser storage."><meta name="twitter:image" content="https://apk-release-pocket.sociobot.in/assets/social-card.jpg">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="stylesheet" href="/src/style.css"><link rel="stylesheet" href="/src/fixes.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header"><a class="brand" href="/" aria-label="APK Release Pocket home"><span>ARP</span><small>release pocket</small></a><nav aria-label="Primary navigation"><a href="/demo/">Demo</a><a href="/#install">Install</a><a href="/privacy/" aria-current="page">Privacy</a><a href="https://github.com/B-Divyesh/sf-apk-release-pocket" rel="external">Source ↗</a></nav></header>
+    <main id="main" class="legal-main">
+      <p class="kicker">Plain-language policy</p><h1>Privacy</h1><p>Effective August 28, 2026.</p>
+      <h2>The CLI</h2><p>The CLI reads APKs and writes release files on your computer. It contains no analytics or upload code.</p>
+      <h2>The website</h2><p>The site loads release details from the GitHub API. A successful response is saved in your browser for one hour.</p><p>The site does not load ads, analytics, or third-party fonts. The host may keep short access logs for security and delivery.</p>
+      <h2>The demo</h2><p>The demo uses bundled sample data. Demo approval notes use browser keys that start with <code>demo:</code>. Resetting or leaving the demo removes those keys.</p>
+      <h2>Paid licenses</h2><p>If you enter a license, the site saves it in this browser. The site sends it to <code>api.sociobot.in</code> for a license check.</p><p>Successful checks are reused for one day. Local approval notes also stay in this browser. Remove the site’s browser data to delete them.</p>
+      <h2>Contact</h2><p>Open an issue in the <a href="https://github.com/B-Divyesh/sf-apk-release-pocket/issues" rel="external">public repository ↗</a>. Never post a license or private APK.</p>
+    </main>
+    <footer><a class="brand" href="/"><span>ARP</span><small>release pocket</small></a><p>Check and publish direct-install Android releases. <small>Built by Param Factory · v0.1.1</small></p><nav aria-label="Legal"><a href="/privacy/" aria-current="page">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-apk-release-pocket" rel="external">GitHub ↗</a></nav></footer>
+  </body>
+</html>

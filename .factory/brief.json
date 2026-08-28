@@ -1,6 +1,7 @@
 {
   "slug": "apk-release-pocket",
   "title": "APK Release Pocket",
+  "summary": "Check a signed Android APK and publish clear install steps.",
   "territory": "devtools-data",
   "user": "Indie Android developers who distribute legitimate test or direct-install builds and need a repeatable, user-verifiable sideload release process.",
   "smallest_useful_product": "CLI plus static release bundle that verifies APK signatures/version codes, generates a QR install page, records compatible ABI/SDK facts, and keeps signed prior releases.",

@@ -1,8 +1,18 @@
 # APK Release Pocket
 
-Turn a signed Android APK into a small, self-hosted release page that users can verify before installing. It is for indie Android developers shipping legitimate test or direct-install builds who are tired of rewriting install instructions and diagnosing the wrong APK over chat.
+Turn a signed Android APK into a small release page that users can check before installing. It is for indie developers who ship test or direct-install Android builds.
 
 APK Release Pocket is local-first and has no telemetry. It never signs an app, collects credentials, weakens Android protections, or bypasses device policy.
+
+## Try the bundled sample
+
+Run the full release flow without supplying an APK:
+
+```sh
+arp demo
+```
+
+The command checks the bundled Imagepipe sample. It writes a release pocket to a new temporary folder. The sample never reads or changes your release files. The matching browser demo is at <https://apk-release-pocket.sociobot.in/demo/>.
 
 ## Install
 
@@ -50,9 +60,9 @@ arp release app-release.apk \
   --notes "Fixes offline sync"
 ```
 
-The command cryptographically verifies an APK Signature Scheme v2 signature, extracts package/version/SDK/ABI facts, checks that a new version code increases, copies the immutable APK into `releases/`, and atomically regenerates `index.html`, `release.json`, `releases.json`, and `SHA256SUMS`. Existing signed releases remain available for deterministic rollback.
+The command checks an APK Signature Scheme v2 signature and the signed content digest. It reads the package, version, Android range, processor support, publisher, and file checksum. It rejects changed publishers and unexpected version decreases. It then writes `index.html`, release JSON, `SHA256SUMS`, and an immutable APK copy. Existing signed releases remain available for rollback.
 
-Important: v1-only, v3-only, and ECDSA/DSA-only APKs are rejected by v0.1.0 because the embedded verifier currently supports RSA-backed v2 signatures. Modern APKs may contain v2 alongside v3. Nothing is published unless verification succeeds.
+Important: version 0.1.1 accepts RSA-backed v2 signatures. It rejects v1-only, v3-only, and ECDSA/DSA-only APKs. Modern APKs may contain v2 beside v3. A failed check writes no release.
 
 Useful options:
 
@@ -63,25 +73,25 @@ Useful options:
 --ci                            Disable decoration and require non-interactive behavior
 ```
 
-Exit codes are `0` success, `2` invalid arguments, `3` unreadable/invalid APK, `4` signature failure, `5` publisher mismatch, and `6` release policy or write failure.
+Exit codes have stable meanings. They are `0` success, `2` arguments, `3` APK, `4` signature, `5` publisher, and `6` release writing.
 
 ## Develop and verify
 
 Requires Rust 1.85+ and Node 22+.
 
 ```sh
-cargo test
-npm install
+cargo test --locked
+npm ci
 npm test
-npm run build       # exact deploy build; outputs dist/site/index.html
-cargo package
+npm run build:site  # exact deploy build; outputs dist/site/index.html
+cargo package --locked
 ```
 
 For local site work, run `npm run dev` and open the printed URL. The static deploy root is `dist/site`.
 
 ## Release
 
-Tags matching `v*` run the GitHub Actions matrix for Linux, macOS arm64/x64, and Windows, create native packages, publish `SHA256SUMS` plus `latest.json`, and attach everything to a GitHub Release. See [.github/workflows/release.yml](.github/workflows/release.yml).
+Tags matching `v*` start the GitHub Actions release matrix. It builds Linux, macOS arm64/x64, and Windows packages. It also publishes checksums, release metadata, and package-manager files. See [.github/workflows/release.yml](.github/workflows/release.yml).
 
 ## Privacy and license
 

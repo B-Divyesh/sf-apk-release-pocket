@@ -33,6 +33,18 @@ enum Command {
     Inspect(InspectArgs),
     /// Verify an APK, enforce release identity, and update a static pocket
     Release(ReleaseArgs),
+    /// Run the full release flow on a bundled sample APK in a temporary folder
+    Demo(DemoArgs),
+}
+
+#[derive(Args, Debug)]
+struct DemoArgs {
+    /// Emit one JSON object for scripts and CI
+    #[arg(long)]
+    json: bool,
+    /// Disable decorative terminal output (all commands are non-interactive)
+    #[arg(long)]
+    ci: bool,
 }
 
 #[derive(Args, Debug)]
@@ -187,7 +199,61 @@ fn run(cli: Cli) -> Result<(), AppError> {
             }
             Ok(())
         }
+        Command::Demo(args) => run_demo(args),
     }
+}
+
+fn run_demo(args: DemoArgs) -> Result<(), AppError> {
+    const SAMPLE_APK: &[u8] = include_bytes!("../examples/imagepipe-0.72.apk");
+    let unique = OffsetDateTime::now_utc().unix_timestamp_nanos();
+    let root = std::env::temp_dir().join(format!(
+        "apk-release-pocket-demo-{}-{unique}",
+        std::process::id()
+    ));
+    fs::create_dir(&root).map_err(write_error)?;
+    let apk = root.join("imagepipe-0.72.apk");
+    fs::write(&apk, SAMPLE_APK).map_err(write_error)?;
+    let out = root.join("pocket");
+    let release_args = ReleaseArgs {
+        apk: apk.clone(),
+        out: out.clone(),
+        base_url: "https://example.invalid/imagepipe".into(),
+        title: Some("Imagepipe sample".into()),
+        notes: "Bundled sample for the isolated demo.".into(),
+        expected_fingerprint: Some(
+            "36:91:F6:EF:66:DB:E3:F7:97:11:84:D3:BB:BC:F2:25:25:44:5B:41:58:AA:63:32:16:34:71:DB:4C:3B:F6:10".into(),
+        ),
+        allow_downgrade: false,
+        json: false,
+        ci: args.ci,
+    };
+    let inspection = inspect_apk(&apk, release_args.expected_fingerprint.as_deref())?;
+    let record = publish(&release_args, inspection)?;
+    if args.json {
+        println!(
+            "{}",
+            serde_json::json!({
+                "demo": true,
+                "temporary_directory": root,
+                "pocket": out,
+                "release": record,
+            })
+        );
+    } else {
+        let mark = if args.ci { "verified" } else { "✓ verified" };
+        println!(
+            "{mark} {} {} ({})",
+            record.title, record.inspection.version_name, record.inspection.version_code
+        );
+        println!(
+            "  publisher  {}",
+            record.inspection.publisher_fingerprint_sha256
+        );
+        println!("  pocket     {}", out.join("index.html").display());
+        println!("  sample     {}", apk.display());
+        println!("Demo files stay in this temporary folder until you remove them.");
+    }
+    Ok(())
 }
 
 fn inspect_apk(path: &Path, expected: Option<&str>) -> Result<Inspection, AppError> {

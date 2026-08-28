@@ -4,9 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#090d12">
-    <meta name="description" content="Verify signed Android APKs and ship a self-hosted install page with QR guidance and rollback history.">
-    <title>APK Release Pocket — ship a verifiable APK release</title>
+    <meta name="description" content="Check a signed Android APK, then publish an install page with device facts, QR guidance, checksums, and prior releases.">
+    <title>APK Release Pocket — verify and publish Android APKs</title>
+    <link rel="canonical" href="https://apk-release-pocket.sociobot.in/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="APK Release Pocket — verify and publish Android APKs">
+    <meta property="og:description" content="Check a signed APK and publish clear install steps.">
+    <meta property="og:url" content="https://apk-release-pocket.sociobot.in/">
+    <meta property="og:image" content="https://apk-release-pocket.sociobot.in/assets/social-card.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="APK Release Pocket — verify and publish Android APKs">
+    <meta name="twitter:description" content="Check a signed APK and publish clear install steps.">
+    <meta name="twitter:image" content="https://apk-release-pocket.sociobot.in/assets/social-card.jpg">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="preload" href="/assets/hero.webp" as="image" type="image/webp" fetchpriority="high">
     <link rel="stylesheet" href="/src/style.css">
     <link rel="stylesheet" href="/src/fixes.css">
@@ -14,10 +25,15 @@
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
+    <aside class="demo-banner" id="demo-banner" aria-label="Demo controls" hidden>
+      <p><strong>Demo</strong> — sample data, nothing is saved to your releases.</p>
+      <div><button id="demo-reset" type="button">Reset demo</button><a id="start-real" href="/">Start for real</a></div>
+      <p class="sr-only" id="demo-status" role="status" aria-live="polite"></p>
+    </aside>
     <header class="site-header">
       <a class="brand" href="/" aria-label="APK Release Pocket home"><span>ARP</span><small>release pocket</small></a>
       <nav aria-label="Primary navigation">
-        <a href="#workflow">Workflow</a><a href="#install">Install</a><a href="#pricing">Pricing</a><a href="https://github.com/B-Divyesh/sf-apk-release-pocket">Source</a>
+        <a href="/demo/">Demo</a><a href="#install">Install</a><a href="/privacy/">Privacy</a><a href="https://github.com/B-Divyesh/sf-apk-release-pocket" rel="external">Source ↗</a>
       </nav>
     </header>
 
@@ -27,40 +43,51 @@
           <img src="/assets/hero.webp" width="1440" height="960" alt="" fetchpriority="high">
         </div>
         <div class="hero-copy">
-          <p class="eyebrow"><span class="status-dot"></span>Local release verification</p>
-          <h1 id="hero-title">Hand users an APK they can trust.</h1>
-          <p class="lede">Verify the signer, version, SDK, ABI, and every byte—then publish a tiny install page with QR guidance and signed rollback history.</p>
-          <div class="hero-actions">
-            <a class="button primary" id="platform-download" href="https://github.com/B-Divyesh/sf-apk-release-pocket/releases" data-state="loading"><span>Checking latest release…</span><small id="platform-note">Detecting your platform</small></a>
-            <a class="button quiet" href="#install">Install another way</a>
+          <p class="eyebrow"><span class="status-dot"></span>Android APK release checks</p>
+          <h1 id="hero-title">Ship a verified APK release.</h1>
+          <p class="lede">For indie Android developers who need repeatable checks and clear install steps.</p>
+          <div class="demo-terminal" id="demo-terminal" hidden aria-label="Sample command result">
+            <p><span>$</span> arp demo</p>
+            <p><strong>✓ verified</strong> Imagepipe sample 0.72 (51)</p>
+            <p>publisher&nbsp; 36:91:F6:EF:66:DB:…:F6:10</p>
+            <p>pocket&nbsp;&nbsp;&nbsp;&nbsp; /tmp/apk-release-pocket-demo…/pocket/index.html</p>
           </div>
-          <p class="release-state" id="release-state" role="status" aria-live="polite">Looking for the latest verified CLI build…</p>
+          <div class="hero-actions">
+            <a class="button primary" href="/demo/"><span>Try it with sample data</span><small>See a finished release in one click</small></a>
+            <a class="button quiet" id="platform-download" href="https://github.com/B-Divyesh/sf-apk-release-pocket/releases" data-state="loading"><span>Checking latest release…</span><small id="platform-note">Detecting your platform</small></a>
+          </div>
+          <p class="release-state" id="release-state" role="status" aria-live="polite">Looking for the latest CLI build…</p>
         </div>
       </section>
 
-      <section class="trust-strip" aria-label="Product guarantees">
-        <p><strong>01</strong> no uploads</p><p><strong>02</strong> no re-signing</p><p><strong>03</strong> immutable rollback</p><p><strong>04</strong> JSON for CI</p>
+      <section class="trust-strip" aria-label="Product facts">
+        <p><strong>01</strong> Checks run on your computer</p><p><strong>02</strong> Free CLI under MIT</p><p><strong>03</strong> No account needed</p>
       </section>
 
       <section class="section workflow" id="workflow" aria-labelledby="workflow-title">
-        <div class="section-intro"><p class="kicker">A release, not an attachment</p><h2 id="workflow-title">One check at the counter.</h2><p>Generic file hosts stop at “download.” ARP carries the publisher identity and device fit all the way to the person installing.</p></div>
+        <div class="section-intro"><p class="kicker">A release, not an attachment</p><h2 id="workflow-title">Check every handoff.</h2><p>APK Release Pocket keeps the publisher fingerprint and device facts beside the download.</p></div>
         <ol class="steps">
-          <li><span>01 / inspect</span><h3>Read what will ship</h3><p>Parses the manifest for package, version code, SDK range, and native ABIs.</p></li>
-          <li><span>02 / verify</span><h3>Prove who signed it</h3><p>Checks the v2 signer signature and independently recomputes the APK content digest.</p></li>
-          <li><span>03 / pocket</span><h3>Publish the handoff</h3><p>Writes an install page, QR link, checksums, release JSON, and immutable prior builds.</p></li>
+          <li><span>01 / inspect</span><h3>Read the APK</h3><p>Reads the package, version code, Android range, and processor support.</p></li>
+          <li><span>02 / verify</span><h3>Check the signer</h3><p>Checks the v2 signature and recalculates the signed content digest.</p></li>
+          <li><span>03 / publish</span><h3>Write the release page</h3><p>Writes an install page, QR link, checksums, release JSON, and prior releases.</p></li>
         </ol>
+        <figure class="demo-recording">
+          <img src="/assets/demo-terminal.svg" width="1120" height="420" loading="lazy" alt="Terminal output from arp demo showing a checked Imagepipe release and its temporary output folder.">
+          <figcaption>The bundled sample runs through the real CLI and writes only to a new temporary folder.</figcaption>
+        </figure>
       </section>
 
       <section class="section install" id="install" aria-labelledby="install-title">
-        <div class="section-intro"><p class="kicker">Install the inspector</p><h2 id="install-title">One command. No account.</h2><p>The installer reads the signed GitHub Release manifest and verifies SHA-256 before placing <code>arp</code> on your path.</p></div>
+        <div class="section-intro"><p class="kicker">Install the inspector</p><h2 id="install-title">Install with one command.</h2><p>The installer checks the downloaded archive against its published SHA-256 before installing <code>arp</code>.</p></div>
         <div class="terminal" aria-label="Installation commands">
           <div class="terminal-top"><span></span><span></span><span></span><b>release-counter</b></div>
           <div class="command-row"><span class="prompt">$</span><code id="unix-command">curl -fsSL https://apk-release-pocket.sociobot.in/install.sh | sh</code><button class="copy" data-copy="unix-command" aria-label="Copy macOS and Linux install command">Copy</button></div>
           <div class="command-row"><span class="prompt">PS</span><code id="windows-command">irm https://apk-release-pocket.sociobot.in/install.ps1 | iex</code><button class="copy" data-copy="windows-command" aria-label="Copy Windows install command">Copy</button></div>
           <div class="terminal-output"><span>Then:</span><code>arp release app-release.apk --out ./pocket --base-url https://downloads.example.com</code></div>
+          <div class="terminal-output"><span>Or try:</span><code>arp demo</code></div>
         </div>
-        <div class="package-links"><a href="https://github.com/B-Divyesh/sf-apk-release-pocket/releases">Native packages</a><a href="https://github.com/B-Divyesh/sf-apk-release-pocket#install">Homebrew &amp; Scoop</a><a href="https://github.com/B-Divyesh/sf-apk-release-pocket/blob/main/README.md#usage">Full CLI reference</a></div>
-        <p class="unsigned-note"><span>!</span> macOS and Windows builds are unsigned in v0.1.0. Always compare the published checksum; the installers do this automatically.</p>
+        <div class="package-links"><a href="https://github.com/B-Divyesh/sf-apk-release-pocket/releases" rel="external">Native packages ↗</a><a href="https://github.com/B-Divyesh/sf-apk-release-pocket#install" rel="external">Homebrew and Scoop ↗</a><a href="https://github.com/B-Divyesh/sf-apk-release-pocket/blob/main/README.md#usage" rel="external">CLI guide ↗</a></div>
+        <p class="unsigned-note"><span>!</span> macOS and Windows builds are unsigned. Compare the published checksum before running a manual download.</p>
       </section>
 
       <section class="section receipt" aria-labelledby="receipt-title">
@@ -75,7 +102,7 @@
       <section class="section pricing" id="pricing" aria-labelledby="pricing-title">
         <div class="section-intro"><p class="kicker">Keep the lights on</p><h2 id="pricing-title">Free locally. Team-ready once.</h2></div>
         <div class="price-grid">
-          <article><p class="plan">Open counter</p><p class="price">$0 <small>forever</small></p><ul><li>Unlimited local APK checks</li><li>Static release pockets</li><li>Publisher pinning and rollback</li><li>JSON CI output</li></ul><a class="button quiet" href="#install">Install free</a></article>
+          <article><p class="plan">Open counter</p><p class="price">$0</p><ul><li>Local APK checks</li><li>Static release pockets</li><li>Publisher pinning and rollback</li><li>JSON CI output</li></ul><a class="button quiet" href="#install">Install free</a></article>
           <article class="paid"><p class="plan">Team lantern</p><p class="price">$39 <small>one time</small></p><ul><li>Local team audit trail</li><li>Named release approvals</li><li>Hosted-domain onboarding</li><li>Future v1 team updates</li></ul><a class="button primary" href="https://api.sociobot.in/api/v1/products/apk-release-pocket/checkout" id="buy-link">Buy team unlock</a><p class="merchant">Sociobot/Dodo is merchant of record. Refunds revoke the license.</p></article>
         </div>
 
@@ -91,12 +118,12 @@
         </section>
       </section>
 
-      <section class="section boundary" aria-labelledby="boundary-title">
+      <section class="section boundary" aria-labelledby="boundary-title" id="privacy">
         <p class="kicker">The safety boundary</p><h2 id="boundary-title">No shortcuts around Android.</h2><p>ARP verifies and explains legitimate direct-install releases. It does not create signatures, disguise packages, collect device credentials, disable protections, or promise that a verified publisher is trustworthy. Users still choose whether to install.</p>
       </section>
     </main>
 
-    <footer><a class="brand" href="/"><span>ARP</span><small>release pocket</small></a><p>Local-first tooling for careful Android releases.</p><nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-apk-release-pocket">GitHub</a></nav></footer>
+    <footer><a class="brand" href="/"><span>ARP</span><small>release pocket</small></a><p>Check and publish direct-install Android releases. <small>Built by Param Factory · v0.1.1</small></p><nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-apk-release-pocket" rel="external">GitHub ↗</a></nav></footer>
     <div id="copy-status" class="sr-only" aria-live="polite"></div>
   </body>
 </html>

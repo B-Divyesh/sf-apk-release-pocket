@@ -32,6 +32,8 @@ Corners are clipped like vendor tickets rather than softly rounded SaaS cards. H
 
 The original hero artwork is a raster editorial illustration of a tiny night-market APK verification stall: phone, hanging signs, receipt printer, and a luminous shield-check. It explains the product journey without fake UI or text. Generated with `/opt/fleet/lib/gen-image.sh` using the factory image deployment, then converted to WebP. Prompt provenance is recorded beside the asset in `site/assets/hero.prompt.json`; the generated output is project-owned and used under the repository MIT license.
 
+The terminal recording at `site/public/assets/demo-terminal.svg` is an original, hand-authored vector using the same counter colors and receipt-like spacing. It records the real `arp demo` output without an external player or font. The 1200 × 630 social card and 180 px touch icon are crops of the original hero artwork, made locally with ImageMagick. No new third-party visual assets were added.
+
 ## Motion
 
 Only the sign, result stamp, and disclosure transitions move. Entrances use 180–260 ms opacity/translate; button presses use 120 ms transform. No animation loops and nothing flashes. Under `prefers-reduced-motion: reduce`, all transforms and transitions become instant while hierarchy remains intact through scale, border, and contrast.

@@ -1,6 +1,6 @@
 [package]
 name = "apk-release-pocket"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "Verify signed Android APKs and build self-hosted release pockets"
 license = "MIT"

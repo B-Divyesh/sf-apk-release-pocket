@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-MANIFEST_URL="https://github.com/B-Divyesh/sf-apk-release-pocket/releases/latest/download/latest.json"
+MANIFEST_URL="${ARP_MANIFEST_URL:-https://github.com/B-Divyesh/sf-apk-release-pocket/releases/latest/download/latest.json}"
 INSTALL_DIR="${ARP_INSTALL_DIR:-${HOME}/.local/bin}"
 TEMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TEMP_DIR"' EXIT INT TERM

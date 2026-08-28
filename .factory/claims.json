@@ -1,0 +1,72 @@
+[
+  {
+    "id": "apk-verification",
+    "claim": "Checks an APK v2 signature and its signed content digest.",
+    "where": "landing workflow, README",
+    "test": "npm test -- --grep @claim:apk-verification",
+    "sandbox": "bundled signed Imagepipe APK; assert verified signer, digest, package, and APK hash"
+  },
+  {
+    "id": "demo-sandbox",
+    "claim": "Runs the full release flow without setup in a new temporary folder.",
+    "where": "landing demo action, README",
+    "test": "npm test -- --grep @claim:demo-sandbox",
+    "sandbox": "empty environment; bundled sample; assert a new OS temporary directory and pocket"
+  },
+  {
+    "id": "pocket-files",
+    "claim": "Writes an install page, QR link, checksums, release JSON, and prior releases.",
+    "where": "landing workflow, README",
+    "test": "npm test -- --grep @claim:pocket-files",
+    "sandbox": "arp demo output; assert each file, QR markup, and matching checksum"
+  },
+  {
+    "id": "cli-local",
+    "claim": "CLI checks and release generation run on the user's computer without network access.",
+    "where": "landing facts, privacy, README",
+    "test": "npm test -- --grep @claim:cli-local",
+    "sandbox": "LD_PRELOAD network guard around arp demo; assert no connect call"
+  },
+  {
+    "id": "mit-license",
+    "claim": "The CLI is free under the MIT license.",
+    "where": "landing facts, README",
+    "test": "npm test -- --grep @claim:mit-license",
+    "sandbox": "assert Cargo package metadata and shipped license text"
+  },
+  {
+    "id": "checksum-install",
+    "claim": "The macOS and Linux installer verifies SHA-256 before installing arp.",
+    "where": "landing install section, README",
+    "test": "npm test -- --grep @claim:checksum-install",
+    "sandbox": "local manifest server; assert mismatched archive is refused and matching archive installs"
+  },
+  {
+    "id": "demo-isolation",
+    "claim": "Demo approval notes stay separate and are removed when the visitor leaves demo mode.",
+    "where": "demo banner, privacy",
+    "test": "npm test -- --grep @claim:demo-isolation",
+    "sandbox": "fresh /demo browser context; add a note, inspect demo namespace, then leave"
+  },
+  {
+    "id": "team-audit",
+    "claim": "Team lantern adds local approval notes and JSON export.",
+    "where": "landing pricing, terms",
+    "test": "npm test -- --grep @claim:team-audit",
+    "sandbox": "demo license; add an approval and assert the downloaded JSON file"
+  },
+  {
+    "id": "license-cache",
+    "claim": "A successful license check is reused for one day.",
+    "where": "landing license form, privacy",
+    "test": "npm test -- --grep @claim:license-cache",
+    "sandbox": "mock billing verifier; reload and assert only one verification request"
+  },
+  {
+    "id": "site-privacy",
+    "claim": "The website has no analytics, ads, third-party fonts, or tracking cookies.",
+    "where": "privacy",
+    "test": "npm test -- --grep @claim:site-privacy",
+    "sandbox": "fresh /demo browser context; assert every request is same-origin and document.cookie is empty"
+  }
+]
