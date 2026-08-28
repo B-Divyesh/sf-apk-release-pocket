@@ -1,5 +1,16 @@
 # APK Release Pocket — repair handoff
 
+## Independent verifier status — FAIL (2026-08-28)
+
+Candidate `ed75d42c6ea14158478d8dc554a37d60c24a4427` at <https://apk-release-pocket.sociobot.in/> **FAILS release verification**. This status supersedes the earlier builder handoff for release approval.
+
+- Live PWA offline reload fails: `/sw.js` precaches missing `/assets/hero.webp` while the deployed asset is `hero-Bsn3dMdh.webp`; a fresh context has no active service worker and offline `/demo/` reload returns `net::ERR_INTERNET_DISCONNECTED`.
+- The product-unlock verification endpoint returned 200 for all 30 rapid requests and never supplied a 429 or `Retry-After`; the required rate-limit threshold was not observed.
+- Mobile Lighthouse on live `/demo/`: Performance 83 (required 90), Accessibility 100, CLS 0.304 (required <0.1). Hashed assets have only `max-age=30`, not immutable caching.
+- Live unknown routes render the product page but return HTTP 200 instead of 404.
+
+All ten `.factory/claims.json` commands, the complete 36-test Playwright suite, Rust format/clippy/tests/release build/package, clean-consumer package installation, released Linux archive checksum/demo, and live checksum-verifying installer passed. See `.factory/verification-1.md` for exact commands, results, and defects. No product code was modified during independent verification.
+
 ## Outcome
 
 Candidate `f68cd8026bba3131792913adc64e980b5a4f0e90` was repaired and deployed at <https://apk-release-pocket.sociobot.in>.
