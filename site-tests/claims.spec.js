@@ -116,6 +116,8 @@ test('@claim:demo-isolation keeps sample notes separate and removes them on exit
 
 test('@claim:team-audit adds an approval and exports JSON in the demo', async ({ page }) => {
   await page.goto('/demo/');
+  await expect(page.locator('#pricing')).toContainText('$39');
+  await expect(page.locator('#pricing')).toContainText('one time');
   await page.getByLabel('Approval note').fill('Matched the publisher fingerprint');
   await page.getByRole('button', { name: 'Add approval' }).click();
   await expect(page.locator('#audit-list')).toContainText('Matched the publisher fingerprint');

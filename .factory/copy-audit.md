@@ -25,8 +25,8 @@ Audited August 28, 2026. Counts treat hyphenated terms and version numbers as on
 | 9 | The release receipt stays with the APK. |
 | 3 | Free locally. |
 | 2 | Team-ready once. |
-| 5 | Sociobot/Dodo is merchant of record. |
-| 4 | Refunds revoke the license. |
+| 6 | Sociobot/Dodo will be merchant of record. |
+| 5 | Refunds will revoke the license. |
 | 7 | Your token stays in this browser. |
 | 7 | Verification runs at most once per day. |
 | 17 | Add an approval note to this browser and export a portable JSON trail at any time. |
