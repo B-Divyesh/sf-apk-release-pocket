@@ -20,6 +20,17 @@ irm https://apk-release-pocket.sociobot.in/install.ps1 | iex
 
 Homebrew and Scoop packages are produced by each GitHub Release. Native `.pkg`, `.deb`, `.rpm`, Windows zip, and standalone archives are also attached. The macOS and Windows packages are unsigned; inspect the published SHA-256 sums and use the documented OS override if prompted.
 
+```sh
+brew install B-Divyesh/apk-release-pocket/apk-release-pocket
+```
+
+```powershell
+scoop bucket add apk-release-pocket https://github.com/B-Divyesh/sf-apk-release-pocket
+scoop install apk-release-pocket/apk-release-pocket
+```
+
+On macOS, if Gatekeeper blocks the unsigned `.pkg`, Control-click it, choose **Open**, and confirm only after comparing its checksum. On Windows, SmartScreen may require **More info → Run anyway** for the portable zip; again, verify `SHA256SUMS` first. A ready-to-submit winget manifest lives in `winget/` and is finalized with release hashes by the workflow.
+
 ## Usage
 
 Inspect an APK without writing anything:
@@ -41,7 +52,7 @@ arp release app-release.apk \
 
 The command cryptographically verifies an APK Signature Scheme v2 signature, extracts package/version/SDK/ABI facts, checks that a new version code increases, copies the immutable APK into `releases/`, and atomically regenerates `index.html`, `release.json`, `releases.json`, and `SHA256SUMS`. Existing signed releases remain available for deterministic rollback.
 
-Important: v1-only and v3-only APKs are rejected by v0.1.0 because the embedded verifier currently supports v2. Modern APKs may contain v2 alongside v3. Nothing is published unless verification succeeds.
+Important: v1-only, v3-only, and ECDSA/DSA-only APKs are rejected by v0.1.0 because the embedded verifier currently supports RSA-backed v2 signatures. Modern APKs may contain v2 alongside v3. Nothing is published unless verification succeeds.
 
 Useful options:
 

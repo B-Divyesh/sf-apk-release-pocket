@@ -11,6 +11,16 @@ test('has one clear heading and resilient release state', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Hand users an APK they can trust.' })).toBeVisible();
   await expect(page.getByRole('link', { name: /View release downloads/ })).toBeVisible();
   await expect(page.getByText(/first release asset is not available yet/i)).toBeVisible();
+  await expect(page.locator('#audit-desk')).toBeHidden();
+});
+
+test('uses the detected platform asset from a valid manifest', async ({ page }) => {
+  await page.route('https://github.com/**/latest.json', (route) => route.fulfill({
+    json: { version: 'v0.1.0', assets: { 'linux-x86_64': { name: 'arp-linux.tar.gz', url: 'https://example.com/arp-linux.tar.gz', sha256: 'abc' } } }
+  }));
+  await page.goto('/');
+  await expect(page.locator('#platform-download')).toHaveAttribute('href', 'https://example.com/arp-linux.tar.gz');
+  await expect(page.locator('#release-state')).toContainText('SHA-256 published');
 });
 
 test('copies the install command and supports keyboard navigation', async ({ page }) => {
@@ -37,4 +47,15 @@ test('legal pages render independently', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1, name: 'Privacy' })).toBeVisible();
   await page.goto('/terms/');
   await expect(page.getByRole('heading', { level: 1, name: 'Terms' })).toBeVisible();
+});
+
+test('loads without browser console errors', async ({ page }) => {
+  const errors = [];
+  page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
+  await page.route('https://github.com/**/latest.json', (route) => route.fulfill({
+    json: { version: 'v0.1.0', assets: { 'linux-x86_64': { name: 'arp-linux.tar.gz', url: 'https://example.com/arp-linux.tar.gz', sha256: 'abc' } } }
+  }));
+  await page.goto('/');
+  await page.waitForLoadState('networkidle');
+  expect(errors).toEqual([]);
 });
