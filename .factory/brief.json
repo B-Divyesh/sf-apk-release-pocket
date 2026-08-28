@@ -1,0 +1,10 @@
+{
+  "slug": "apk-release-pocket",
+  "title": "APK Release Pocket",
+  "territory": "devtools-data",
+  "user": "Indie Android developers who distribute legitimate test or direct-install builds and need a repeatable, user-verifiable sideload release process.",
+  "smallest_useful_product": "CLI plus static release bundle that verifies APK signatures/version codes, generates a QR install page, records compatible ABI/SDK facts, and keeps signed prior releases.",
+  "artifact_class": "cli-installers",
+  "monetization": "freemium — open local/static releases build trust; paid hosted domains and team audit logs can fund maintenance.",
+  "constraints": "Must not facilitate malware or policy evasion; show publisher fingerprint prominently; obey Android distribution rules; no credential collection."
+}

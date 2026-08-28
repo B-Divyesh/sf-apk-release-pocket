@@ -1,14 +1,79 @@
 # APK Release Pocket
 
-Live: https://apk-release-pocket.sociobot.in — built by the Param Factory (`cli-installers`).
+Turn a signed Android APK into a small, self-hosted release page that users can verify before installing. It is for indie Android developers shipping legitimate test or direct-install builds who are tired of rewriting install instructions and diagnosing the wrong APK over chat.
 
-See `.factory/brief.json` for the researched problem this solves and `.factory/design.md` for the visual system.
+APK Release Pocket is local-first and has no telemetry. It never signs an app, collects credentials, weakens Android protections, or bypasses device policy.
 
-## Develop
+## Install
 
+macOS and Linux:
+
+```sh
+curl -fsSL https://apk-release-pocket.sociobot.in/install.sh | sh
 ```
+
+Windows PowerShell:
+
+```powershell
+irm https://apk-release-pocket.sociobot.in/install.ps1 | iex
+```
+
+Homebrew and Scoop packages are produced by each GitHub Release. Native `.pkg`, `.deb`, `.rpm`, Windows zip, and standalone archives are also attached. The macOS and Windows packages are unsigned; inspect the published SHA-256 sums and use the documented OS override if prompted.
+
+## Usage
+
+Inspect an APK without writing anything:
+
+```sh
+arp inspect app-release.apk
+arp inspect app-release.apk --json
+```
+
+Build or update a static release pocket:
+
+```sh
+arp release app-release.apk \
+  --out ./release-pocket \
+  --base-url https://downloads.example.com/my-app \
+  --title "My App" \
+  --notes "Fixes offline sync"
+```
+
+The command cryptographically verifies an APK Signature Scheme v2 signature, extracts package/version/SDK/ABI facts, checks that a new version code increases, copies the immutable APK into `releases/`, and atomically regenerates `index.html`, `release.json`, `releases.json`, and `SHA256SUMS`. Existing signed releases remain available for deterministic rollback.
+
+Important: v1-only and v3-only APKs are rejected by v0.1.0 because the embedded verifier currently supports v2. Modern APKs may contain v2 alongside v3. Nothing is published unless verification succeeds.
+
+Useful options:
+
+```text
+--expected-fingerprint <SHA256>  Refuse an unexpected publisher identity
+--allow-downgrade               Record a lower/equal version code intentionally
+--json                          Emit machine-readable output
+--ci                            Disable decoration and require non-interactive behavior
+```
+
+Exit codes are `0` success, `2` invalid arguments, `3` unreadable/invalid APK, `4` signature failure, `5` publisher mismatch, and `6` release policy or write failure.
+
+## Develop and verify
+
+Requires Rust 1.85+ and Node 22+.
+
+```sh
+cargo test
 npm install
-npm run dev
 npm test
-npm run build   # -> dist/
+npm run build       # exact deploy build; outputs dist/site/index.html
+cargo package
 ```
+
+For local site work, run `npm run dev` and open the printed URL. The static deploy root is `dist/site`.
+
+## Release
+
+Tags matching `v*` run the GitHub Actions matrix for Linux, macOS arm64/x64, and Windows, create native packages, publish `SHA256SUMS` plus `latest.json`, and attach everything to a GitHub Release. See [.github/workflows/release.yml](.github/workflows/release.yml).
+
+## Privacy and license
+
+All APK inspection and release generation happens on your machine. The marketing site stores a paid license token only when you provide one. See [Privacy](https://apk-release-pocket.sociobot.in/privacy/) and [Terms](https://apk-release-pocket.sociobot.in/terms/).
+
+MIT licensed. See [LICENSE](LICENSE).
