@@ -7,7 +7,9 @@ const LICENSE_KEY = 'sb_license:apk-release-pocket';
 const VERDICT_KEY = 'sb_license_verdict:apk-release-pocket';
 const AUDIT_KEY = 'arp_team_audit';
 const DAY = 86_400_000;
-const demoMode = location.pathname.replace(/\/+$/, '') === '/demo' || new URLSearchParams(location.search).get('demo') === '1';
+const routePath = location.pathname.replace(/\/+$/, '') || '/';
+const demoMode = routePath === '/demo' || new URLSearchParams(location.search).get('demo') === '1';
+const notFoundMode = !['/', '/demo'].includes(routePath);
 
 function storageGet(key) {
   try { return localStorage.getItem(key); } catch { return null; }
@@ -166,6 +168,16 @@ function setupDemo() {
   });
 }
 
+function setupNotFound() {
+  document.title = 'Page not found — APK Release Pocket';
+  document.querySelector('link[rel="canonical"]')?.remove();
+  document.querySelector('.site-header a[href="#install"]')?.setAttribute('href', '/#install');
+  const main = document.querySelector('#main');
+  if (!main) return;
+  main.className = 'legal-main';
+  main.innerHTML = '<p class="kicker">Missing receipt</p><h1>That page is not in this pocket.</h1><p>The address may have changed, or the page may never have existed.</p><a class="button primary" href="/">Return to the release counter</a>';
+}
+
 function setupCopy() {
   const status = document.querySelector('#copy-status');
   document.querySelectorAll('[data-copy]').forEach((button) => button.addEventListener('click', async () => {
@@ -298,11 +310,15 @@ function setupAudit() {
   });
 }
 
-setupDemo();
-loadRelease().catch(() => showReleasePending(navigator.onLine ? 'unavailable' : 'offline'));
-setupCopy();
-setupLicense();
-setupAudit();
-if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === '127.0.0.1')) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
+if (notFoundMode) {
+  setupNotFound();
+} else {
+  setupDemo();
+  loadRelease().catch(() => showReleasePending(navigator.onLine ? 'unavailable' : 'offline'));
+  setupCopy();
+  setupLicense();
+  setupAudit();
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === '127.0.0.1')) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
 }

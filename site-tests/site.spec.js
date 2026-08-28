@@ -110,12 +110,13 @@ test('has no serious or critical accessibility violations', async ({ page }) => 
 });
 
 test('legal and not-found routes have independent titles and one h1', async ({ page }) => {
-  for (const route of ['/privacy/', '/terms/', '/404/']) {
+  for (const route of ['/privacy/', '/terms/', '/404/', '/missing-page']) {
     await page.goto(route);
     await expect(page.locator('main')).toBeVisible();
     await expect(page.locator('h1')).toHaveCount(1);
     await expect(page).not.toHaveTitle('APK Release Pocket — verify and publish Android APKs');
   }
+  await expect(page.getByRole('heading', { name: 'That page is not in this pocket.' })).toBeVisible();
 });
 
 test('mobile layout has no horizontal overflow and keeps controls large', async ({ page }) => {
