@@ -1,0 +1,10 @@
+{
+  "tool": "/opt/fleet/lib/gen-image.sh",
+  "deployment": "factory-image",
+  "size": "1536x1024",
+  "quality": "high",
+  "base_prompt": "Use case: stylized-concept. Asset type: wide landing-page hero illustration for APK Release Pocket. Primary request: a tiny trustworthy night-market repair stall that verifies Android APK release packages. Scene/backdrop: deep ink-black evening alley with a compact counter, hanging electrical cables, paper release receipts, a smartphone showing a simple check mark, a small receipt printer, and a luminous shield-check sign. Subject: verification handoff from developer laptop to Android phone, shown as a clear visual path through the stall. Style/medium: original editorial digital illustration, screen-printed shapes, slightly rough paper texture, precise technical details, flat perspective, sophisticated developer-tool branding. Composition/framing: wide 3:2 landscape, subject weighted to the right-center, calm dark negative space at upper left for website typography, readable at mobile crop. Lighting/mood: warm coral and amber vendor lights balanced by cyan verification glow; confident, humane, after-hours craftsmanship. Color palette: ink #090d12, paper #f4eddf, coral #ff6b57, cyan #66e4dd, amber #ffc857. Constraints: no words, no letters, no logos, no brand marks, no QR codes, no watermarks, no photorealism, no generic gradient, no hacker imagery, no skulls, no padlocks, no ominous malware cues.",
+  "edit_prompt": "Change only the laptop screen: remove the Android robot icon and replace it with a completely generic coral package cube beside three cyan verification lines. Preserve every other part of the illustration exactly, including the person, robot vendor, phone, glowing arrow, shield-check sign, market stall, crop, palette, lighting, and textures. No letters, no words, no logos, no brand marks, no watermarks.",
+  "output": "hero.webp, 1440x960, WebP quality 78",
+  "license": "Project-owned generated asset, distributed under the repository MIT license."
+}

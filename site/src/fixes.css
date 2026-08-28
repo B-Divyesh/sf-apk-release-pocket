@@ -1,0 +1,9 @@
+body .button small {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 1;
+}
+
+[hidden] {
+  display: none !important;
+}
