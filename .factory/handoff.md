@@ -1,83 +1,65 @@
 # APK Release Pocket — repair handoff
 
-## Independent verifier status — FAIL (2026-08-28)
+## Status
 
-Candidate `ed75d42c6ea14158478d8dc554a37d60c24a4427` at <https://apk-release-pocket.sociobot.in/> **FAILS release verification**. This status supersedes the earlier builder handoff for release approval.
+Implementation commit: `e013eb0c87658b9d69aea1ee708d2557240d71bd`<br>
+Production deployment: `88c2b3c0-2bfe-49f2-a835-93e702ab8290`<br>
+Live URL: <https://apk-release-pocket.sociobot.in/>
 
-- Live PWA offline reload fails: `/sw.js` precaches missing `/assets/hero.webp` while the deployed asset is `hero-Bsn3dMdh.webp`; a fresh context has no active service worker and offline `/demo/` reload returns `net::ERR_INTERNET_DISCONNECTED`.
-- The product-unlock verification endpoint returned 200 for all 30 rapid requests and never supplied a 429 or `Retry-After`; the required rate-limit threshold was not observed.
-- Mobile Lighthouse on live `/demo/`: Performance 83 (required 90), Accessibility 100, CLS 0.304 (required <0.1). Hashed assets have only `max-age=30`, not immutable caching.
-- Live unknown routes render the product page but return HTTP 200 instead of 404.
+The repaired static product is deployed. The prior offline reload, mobile CLS/performance, caching, and HTTP 404 findings are fixed and verified live. One external dependency remains: the Sociobot billing verification endpoint does not yet enforce the required burst rate limit. This product cannot configure that shared endpoint.
 
-All ten `.factory/claims.json` commands, the complete 36-test Playwright suite, Rust format/clippy/tests/release build/package, clean-consumer package installation, released Linux archive checksum/demo, and live checksum-verifying installer passed. See `.factory/verification-1.md` for exact commands, results, and defects. No product code was modified during independent verification.
+## What changed
 
-## Outcome
+- `/demo/` is now a real pre-rendered static document. Its final demo banner, sample terminal, headline, and layout arrive before first paint. It does not preload the decorative hero image.
+- The service worker discovers Vite-hashed same-origin assets from the generated landing document while it installs. It no longer precaches the unstable `/assets/hero.webp` path.
+- Static deployment now has no SPA fallback. `/demo/` is a physical route and unknown URLs use the styled `/404/` response with HTTP 404.
+- Hashed `/assets/*` use `Cache-Control: public, max-age=31536000, immutable`; `/sw.js` uses `Cache-Control: no-cache` so updates arrive promptly.
+- Browser tests run against a small production-like static server rather than Vite’s SPA preview fallback. New outcome checks cover offline reload, 404 response status, cache headers, and demo layout shift.
+- Added `.factory/catalog-description.txt` and copied it to `/work/.evidence/catalog-description.txt`: “Check a signed Android APK and publish clear install steps.”
+- Wrote `/work/.evidence/billing-offer.json` for the unregistered $39 one-time Team lantern offer. It contains only public offer metadata.
 
-Candidate `f68cd8026bba3131792913adc64e980b5a4f0e90` was repaired and deployed at <https://apk-release-pocket.sociobot.in>.
+## Verification
 
-The original failure was reproduced in a fresh Chromium session. The browser requested `github.com/B-Divyesh/sf-apk-release-pocket/releases/latest/download/latest.json`, followed its redirect, and logged a CORS error plus `net::ERR_FAILED`. The page then showed a false “first release not available” state despite the public v0.1.0 release.
-
-The site now requests `https://api.github.com/repos/B-Divyesh/sf-apk-release-pocket/releases/latest`. It maps the detected platform to `assets[].browser_download_url`, accepts only expected HTTPS GitHub URLs, and saves successful API responses in `arp:github-release` for one hour. A stale successful response remains usable when refresh fails. A missing or unavailable release shows “Downloads are being published” with a GitHub Releases link. Every async path is caught.
-
-## Product work completed
-
-- Kept the Rust single-binary CLI, Android APK release-pocket job, GitHub Actions release flow, and Azure static deployment class.
-- Added `arp demo`, which checks a bundled signed Imagepipe APK through the real verifier and writes a complete pocket to a new temporary directory.
-- Added the one-click `/demo/` route, persistent demo banner, reset/exit controls, `demo:` storage namespace, sample approval, and original self-hosted terminal SVG.
-- Rewrote the first screen in plain words and added the required three facts, product preview, three-step workflow, safety boundary, pricing, legal routes, and consistent footer.
-- Added per-route titles, canonical and social metadata, a 1200 × 630 social card, touch icon, robots file, sitemap, security headers, and a designed 404 for unknown routes.
-- Updated the service worker to precache the shell, use network-first navigation, remove old caches, and recover the demo offline.
-- Added `.factory/claims.json`, `.factory/copy-audit.md`, and `.factory/demo.md`.
-- Released v0.1.1 with Linux, macOS arm64/x64, Windows, `.deb`, `.rpm`, `.pkg`, checksum, package-manager, and release-metadata assets.
-
-## Reproduce, run, and verify
+### Local and clean checkout
 
 ```sh
 cargo fmt --check
 cargo clippy --all-targets --locked -- -D warnings
 cargo test --locked
-cargo package --locked
+cargo build --locked --release
+cargo package --locked --allow-dirty
 npm ci
-npm audit
+npm audit --omit=dev
 npm test
-npm run build:site
 npm run build
 ```
 
-`npm run build:site` is the original work-order build command. Vite empties the output directory and writes the static deployment to `dist/site`.
+All commands passed. Rust ran 6 tests. `npm test` ran 42 Playwright tests against the static output. The build produced `dist/site/` with 9.64 kB raw JavaScript, 12.24 kB raw CSS, and a 98.57 kB landing hero; the demo transfer measured 14,085 bytes because it does not load the decorative hero.
 
-Every command in `.factory/claims.json` was also run separately. All ten claim commands passed from their clean Playwright contexts.
+From a fresh clone at the implementation commit, `npm ci` succeeded and every exact command in `.factory/claims.json` passed separately: `apk-verification`, `demo-sandbox`, `pocket-files`, `cli-local`, `mit-license`, `checksum-install`, `demo-isolation`, `team-audit`, `license-cache`, and `site-privacy`.
 
-## Verification evidence
+The packaged crate installed into a clean consumer root with `cargo install --path target/package/apk-release-pocket-0.1.1 --root <temporary-root> --locked`. Its installed `arp` binary showed help and verified the bundled Imagepipe APK, including its package and v2 signature.
 
-- Rust: 6 tests passed; strict clippy and rustfmt passed.
-- Browser: 36 Playwright tests passed across desktop Chromium and 390 × 844 mobile.
-- Regression coverage: API URL, absence of the blocked URL, platform asset selection, one-hour cache reuse, stale fallback, no-release state, malicious cached URL rejection, and zero uncaught errors.
-- Interaction coverage: keyboard copy, returned-license cleanup, daily license cache, demo reset/exit isolation, JSON export, 44 px targets, no mobile overflow, and 200% text.
-- Offline/update coverage: first-visit demo shell reload passed offline; the service worker replaced an injected v1 cache with v2.
-- Accessibility: Playwright axe WCAG 2 A/AA reported zero serious or critical findings. Pages have one h1, ordered headings, landmarks, labels, alt text, a skip link, visible focus, reduced-motion handling, and no keyboard trap.
-- Privacy: the demo made only same-origin requests, set no cookie, and wrote only `demo:` browser keys.
-- `npm audit`: zero known vulnerabilities.
-- Build budgets: JavaScript 9.64 KB raw / 3.75 KB gzip; CSS 12.24 KB raw / 3.72 KB gzip; hero 98.57 KB; fonts 0 KB.
-- Live Lighthouse at 2026-08-28T09:54:22Z: Performance 100, Accessibility 100, Best Practices 100, SEO 100; LCP 1.366 s, CLS 0, TBT 64 ms, total 117,016 bytes.
-- Factory live verifier after the final deploy: HTTP 200, 917 ms network-idle load, correct title and `lang`, one h1, main landmark, no missing alt text, no unlabeled buttons, and zero console/page errors.
-- Live browser identity check: one GitHub API request, zero `github.com/.../latest/download/latest.json` requests, v0.1.1 Linux asset selected, then zero API requests on reload because the cached response was used.
-- Live routes `/`, `/demo/`, `/privacy/`, `/terms/`, `/404/`, `robots.txt`, `sitemap.xml`, both installers, and the social image returned 200. All 14 published page links returned 200.
-- GitHub repository identity: public `B-Divyesh/sf-apk-release-pocket`, default branch `main`.
-- GitHub CI runs `33160821388`, `33161079015`, and `33161347236` passed. Release run `33160944688` passed.
-- The v0.1.1 release contains 17 assets. Its Linux archive SHA-256 is `5605f88768094ca32e4683d97790e08336e5b2d56efac8a7ebf3b64d73ed8287` in `latest.json`, `SHA256SUMS`, and the downloaded file.
-- The downloaded Linux binary reported `arp 0.1.1`; its bundled demo verified the signer and generated all pocket files. The live `curl | sh` installer repeated the checksum check and installed the same version.
-- Final Azure Static Web Apps deployment ID: `601792db-d2bc-4819-b958-e764ed26173b`.
+The public v0.1.1 Linux archive matched `SHA256SUMS`; its `arp demo --json --ci` verified the sample. The live installer installed the checksum-verified v0.1.1 binary into a temporary directory and that binary reported `arp 0.1.1`.
 
-## Known limits
+### HTTPS production
 
-- Version 0.1.1 accepts RSA-backed APK Signature Scheme v2 signatures. It rejects v1-only, v3-only, and ECDSA/DSA-only APKs. APKs that include v2 beside v3 work.
-- macOS `.pkg` and Windows portable artifacts are unsigned. The site states this and directs manual download users to published checksums.
-- The Linux release is x86_64. An arm64 Linux browser falls back to the full GitHub Releases page instead of offering the wrong build.
-- The checked-in Homebrew, Scoop, and winget templates contain placeholder hashes. The release workflow publishes checksum-complete copies from the real assets.
+- `/opt/fleet/lib/verify-url.sh` passed: HTTP 200, title, `lang`, one h1, main landmark, image alt text, labelled buttons, and no console errors.
+- Fresh desktop and 390 px phone contexts loaded `/` at scroll position zero. Both displayed “Ship a verified APK release,” named indie Android developers, and showed “Try it with sample data” in the viewport. There were no console errors and observed CLS was 0.
+- The one-click sample opened `/demo/`, displayed the persistent sample banner, Imagepipe output, and seeded approval. **Reset demo** restored that sample; **Start for real** removed every `demo:` key.
+- In a fresh live service-worker context, `/demo/` became controlled by `arp-site-v3`; an offline reload showed the demo headline and banner with no errors.
+- `GET /missing-page` now returns HTTP 404 and the styled 404 page. The deployed hashed hero returns HTTP 200 with immutable cache control. `/sw.js` returns HTTP 200 with `Cache-Control: no-cache`.
+- Live axe WCAG 2 A/AA scans of `/`, `/demo/`, `/privacy/`, `/terms/`, and `/missing-page` found zero serious or critical violations.
+- Mobile Lighthouse on live `/demo/`: Performance 100, Accessibility 100, Best Practices 100, SEO 100; LCP 932 ms, CLS 0, TBT 12 ms, 14,085 bytes.
 
-## Needs operator action
+## Current limits and operator action
 
-- Register `apk-release-pocket` in the Sociobot billing engine at $39 one time with return URL `https://apk-release-pocket.sociobot.in/?license={token}`. The public page honestly shows “Team sales open soon” until that endpoint exists; license restore and verification are implemented and tested.
-- Configure `HOMEBREW_TAP_TOKEN` if the `B-Divyesh/homebrew-apk-release-pocket` repository should be created and updated automatically.
-- Submit the generated winget manifest to `microsoft/winget-pkgs` after reviewing the published Windows archive.
+- **External billing rate limit remains required.** On 2026-09-05, 30 concurrent invalid-license requests to `https://api.sociobot.in/api/v1/products/apk-release-pocket/verify` returned 30 HTTP 200 responses, with no `429` and no `Retry-After`. This endpoint belongs to the shared Sociobot billing API and is outside this product’s authorised scope. Configure a per-client burst limit that returns HTTP 429 and `Retry-After`, then rerun that live allowance check. Until then, this external acceptance item remains open.
+- Register the public Team lantern offer at $39 one time with return URL `https://apk-release-pocket.sociobot.in/?license={token}`. The page still says sales are not open, while the free CLI and the license restore/verification path remain available.
+- The CLI accepts RSA-backed APK Signature Scheme v2 signatures and rejects v1-only, v3-only, and ECDSA/DSA-only signatures. APKs carrying v2 alongside v3 work.
+- macOS `.pkg` and Windows portable release files are unsigned. Manual installers should compare the published checksum.
+- Linux release downloads are x86_64. Linux arm64 visitors are sent to the full GitHub Releases page rather than a wrong binary.
+
+## Earlier findings
+
+`verification-1.md` remains the historical failed report. Its offline path, CLS/performance, immutable cache, and HTTP 404 findings are addressed above. Its billing-rate-limit finding remains an external dependency and is not represented as a product-code fix.

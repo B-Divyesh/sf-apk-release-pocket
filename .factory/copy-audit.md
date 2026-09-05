@@ -1,6 +1,6 @@
 # Landing-page copy audit
 
-Audited August 28, 2026. Counts treat hyphenated terms and version numbers as one word. Commands, fingerprints, form labels, prices, and navigation labels are fragments rather than sentences. No sentence exceeds 22 words. No banned marketing word appears.
+Re-audited September 5, 2026. Counts treat hyphenated terms and version numbers as one word. Commands, fingerprints, form labels, prices, and navigation labels are fragments rather than sentences. No sentence exceeds 22 words. No banned marketing word appears.
 
 | Words | Sentence |
 |---:|---|
