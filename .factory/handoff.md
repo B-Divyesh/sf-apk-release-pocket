@@ -3,6 +3,7 @@
 ## Status
 
 Implementation commit: `e013eb0c87658b9d69aea1ee708d2557240d71bd`<br>
+Verification documentation commit: `37d319ee87cbf2307212a2a12fd683753a4de1d9`<br>
 Production deployment: `88c2b3c0-2bfe-49f2-a835-93e702ab8290`<br>
 Live URL: <https://apk-release-pocket.sociobot.in/>
 
