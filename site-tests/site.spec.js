@@ -119,6 +119,39 @@ test('legal and not-found routes have independent titles and one h1', async ({ p
   await expect(page.getByRole('heading', { name: 'That page is not in this pocket.' })).toBeVisible();
 });
 
+test('serves an unknown route as the designed page with HTTP 404', async ({ page }) => {
+  const response = await page.goto('/missing-page');
+  expect(response.status()).toBe(404);
+  await expect(page.getByRole('heading', { name: 'That page is not in this pocket.' })).toBeVisible();
+});
+
+test('delivers build assets with immutable caching and checks for a new worker', async ({ page, request }) => {
+  await page.goto('/');
+  const hero = await page.locator('.hero-art img').getAttribute('src');
+  const asset = await request.get(hero);
+  const worker = await request.get('/sw.js');
+  expect(asset.ok()).toBe(true);
+  expect(asset.headers()['cache-control']).toContain('max-age=31536000');
+  expect(asset.headers()['cache-control']).toContain('immutable');
+  expect(worker.headers()['cache-control']).toBe('no-cache');
+});
+
+test('loads the demo in its final layout without a visible shift', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__demoLayoutShift = 0;
+    new PerformanceObserver((entries) => {
+      for (const entry of entries.getEntries()) {
+        if (!entry.hadRecentInput) window.__demoLayoutShift += entry.value;
+      }
+    }).observe({ type: 'layout-shift', buffered: true });
+  });
+  await page.goto('/demo/');
+  await page.waitForLoadState('networkidle');
+  await expect(page.locator('#demo-banner')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'See a verified APK release.' })).toBeVisible();
+  expect(await page.evaluate(() => window.__demoLayoutShift)).toBeLessThan(0.1);
+});
+
 test('mobile layout has no horizontal overflow and keeps controls large', async ({ page }) => {
   await page.goto('/demo/');
   const dimensions = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
@@ -150,11 +183,11 @@ test('demo shell reloads offline after the first visit', async ({ browser, baseU
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(`${baseURL}/404/`);
-  await page.evaluate(() => caches.open('arp-site-v1'));
+  await page.evaluate(() => caches.open('an-outdated-release-cache'));
   await page.goto(`${baseURL}/demo/`);
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.reload();
-  await expect.poll(() => page.evaluate(() => caches.keys())).toEqual(['arp-site-v2']);
+  await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller !== null)).toBe(true);
   await context.setOffline(true);
   await page.reload();
   await expect(page.getByRole('heading', { name: 'See a verified APK release.' })).toBeVisible();

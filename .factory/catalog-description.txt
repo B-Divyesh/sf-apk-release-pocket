@@ -1,0 +1,1 @@
+Check a signed Android APK and publish clear install steps.
